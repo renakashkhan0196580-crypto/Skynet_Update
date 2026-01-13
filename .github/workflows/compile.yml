@@ -1,0 +1,19 @@
+name: Build ESP8266 Bin
+on: [push]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Compile
+        uses: armink/esp-arduino-action@master
+        with:
+          arduino-board-fqbn: esp8266:esp8266:nodemcuv2
+          arduino-lib-names: ESPAsyncWebServer, ESPAsyncTCP
+      - name: Upload Bin
+        uses: actions/upload-artifact@v3
+        with:
+          name: firmware
+          path: ./*.bin
+          
