@@ -5,15 +5,30 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
-      - name: Compile
-        uses: armink/esp-arduino-action@master
+        uses: actions/checkout@v4
+
+      - name: Install Arduino CLI
+        run: |
+          curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh | sh
+          sudo mv bin/arduino-cli /usr/local/bin/
+
+      - name: Install ESP8266 Core
+        run: |
+          arduino-cli core update-index
+          arduino-cli core install esp8266:esp8266
+
+      - name: Install Libraries
+        run: |
+          arduino-cli lib install "ESPAsyncWebServer"
+          arduino-cli lib install "ESPAsyncTCP"
+
+      - name: Compile Code
+        run: |
+          arduino-cli compile --fqbn esp8266:esp8266:nodemcuv2 --output-dir ./build .
+
+      - name: Upload .bin File
+        uses: actions/upload-artifact@v4
         with:
-          arduino-board-fqbn: esp8266:esp8266:nodemcuv2
-          arduino-lib-names: ESPAsyncWebServer, ESPAsyncTCP
-      - name: Upload Bin
-        uses: actions/upload-artifact@v3
-        with:
-          name: firmware
-          path: ./*.bin
+          name: firmware-binary
+          path: ./build/*.bin
           
