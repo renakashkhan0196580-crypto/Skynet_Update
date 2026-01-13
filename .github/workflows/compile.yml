@@ -12,8 +12,10 @@ jobs:
           curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh | sh
           sudo mv bin/arduino-cli /usr/local/bin/
 
-      - name: Install ESP8266 Core
+      - name: Setup ESP8266 Core
         run: |
+          arduino-cli config init
+          arduino-cli config add board_manager.additional_urls http://arduino.esp8266.com/stable/package_esp8266com_index.json
           arduino-cli core update-index
           arduino-cli core install esp8266:esp8266
 
@@ -24,6 +26,7 @@ jobs:
 
       - name: Compile Code
         run: |
+          mkdir build
           arduino-cli compile --fqbn esp8266:esp8266:nodemcuv2 --output-dir ./build .
 
       - name: Upload .bin File
